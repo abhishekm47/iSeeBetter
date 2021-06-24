@@ -39,7 +39,7 @@ def load_img(filepath, nFrames, scale, other_dataset, upscale_only):
                     temp = modcrop(Image.open(filepath[0:char_len-7]+'{0:03d}'.format(index)+'.png').convert('RGB'),scale).resize((int(target.size[0]/scale),int(target.size[1]/scale)), Image.BICUBIC)
                 neigbor.append(temp)
             else:
-                # print('neigbor frame is not exist')
+                print('neigbor frame is not exist')
                 temp = input
                 neigbor.append(temp)
     else:
@@ -73,8 +73,8 @@ def load_img_future(filepath, nFrames, scale, other_dataset, upscale_only):
         #random.shuffle(seq) #if random sequence
         for i in seq:
             index1 = int(filepath[char_len-7:char_len-4])+i
-            file_name1=filepath[0:char_len-7]+'{0:03d}'.format(index1)+'.png'
-            
+            file_name1=filepath[0:char_len-7]+'{0:03d}'.format(index1)+'.jpg'
+            #print(file_name1)
             if os.path.exists(file_name1):
                 if upscale_only:
                     temp = Image.open(file_name1).convert('RGB')
@@ -82,16 +82,16 @@ def load_img_future(filepath, nFrames, scale, other_dataset, upscale_only):
                     temp = modcrop(Image.open(file_name1).convert('RGB'), scale).resize((int(target.size[0]/scale),int(target.size[1]/scale)), Image.BICUBIC)
                 neigbor.append(temp)
             else:
-                # print('neigbor frame- is not exist')
+                print('neigbor frame- is not exist')
                 temp=input
                 neigbor.append(temp)
             
     else:
         if upscale_only:
-            target = Image.open(join(filepath,'im4.png')).convert('RGB')
+            target = Image.open(filepath).convert('RGB')
             input = target
         else:
-            target = modcrop(Image.open(join(filepath,'im4.png')).convert('RGB'),scale)
+            target = modcrop(Image.open(filepath).convert('RGB'),scale)
             input = target.resize((int(target.size[0]/scale),int(target.size[1]/scale)), Image.BICUBIC)
         neigbor = []
         seq = [x for x in range(4-tt,5+tt) if x!=4]
@@ -200,9 +200,9 @@ class DatasetFromFolder(data.Dataset):
 
     def __getitem__(self, index):
         if self.future_frame:
-            target, input, neigbor = load_img_future(self.image_filenames[index], self.nFrames, self.upscale_factor, self.other_dataset)
+            target, input, neigbor = load_img_future(self.image_filenames[index], self.nFrames, self.upscale_factor, self.other_dataset, False)
         else:
-            target, input, neigbor = load_img(self.image_filenames[index], self.nFrames, self.upscale_factor, self.other_dataset)
+            target, input, neigbor = load_img(self.image_filenames[index], self.nFrames, self.upscale_factor, self.other_dataset, False)
 
         if self.patch_size != 0:
             input, target, neigbor, _ = get_patch(input,target,neigbor,self.patch_size, self.upscale_factor, self.nFrames)
